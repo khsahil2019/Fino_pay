@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../core/services/app_access_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../dashboard/screens/fino_home_screen.dart';
+import '../../security/screens/app_locked_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -10,6 +12,7 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+  final AppAccessService _accessService = AppAccessService();
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
@@ -31,21 +34,38 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     );
 
     _controller.forward();
+    _checkAccessAndNavigate();
+  }
 
-    // Transition to Home Screen
-    Future.delayed(const Duration(milliseconds: 2200), () {
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
-          PageRouteBuilder(
-            transitionDuration: const Duration(milliseconds: 600),
-            pageBuilder: (context, animation, secondaryAnimation) => const FinoHomeScreen(),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-              return FadeTransition(opacity: animation, child: child);
-            },
-          ),
-        );
-      }
-    });
+  Future<void> _checkAccessAndNavigate() async {
+    final startTime = DateTime.now();
+    final access = await _accessService.verifyAppAccess();
+
+    // Ensure splash shows at least 1.8 seconds for smooth branding experience
+    final elapsed = DateTime.now().difference(startTime).inMilliseconds;
+    if (elapsed < 1800) {
+      await Future.delayed(Duration(milliseconds: 1800 - elapsed));
+    }
+
+    if (!mounted) return;
+
+    final Widget destination = access.isAllowed
+        ? const FinoHomeScreen()
+        : AppLockedScreen(
+            title: access.title,
+            message: access.message,
+            contactInfo: access.contactInfo,
+          );
+
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 600),
+        pageBuilder: (context, animation, secondaryAnimation) => destination,
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+      ),
+    );
   }
 
   @override

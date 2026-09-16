@@ -10,6 +10,7 @@ import '../../../core/utils/error_helper.dart';
 import '../../photo_upload/screens/photo_preview_screen.dart';
 import '../../photo_upload/widgets/image_preview_card.dart';
 import '../../photo_upload/widgets/photo_picker_bottom_sheet.dart';
+import '../../security/screens/app_locked_screen.dart';
 
 class FinoHomeScreen extends StatefulWidget {
   const FinoHomeScreen({super.key});
@@ -805,6 +806,28 @@ class _FinoHomeScreenState extends State<FinoHomeScreen> with SingleTickerProvid
                       onChanged: (val) => _fileParamName = val,
                     ),
                     const SizedBox(height: 16),
+                    OutlinedButton.icon(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const AppLockedScreen(
+                              title: 'Access Restricted',
+                              message: 'This application access has been disabled by the administrator.',
+                              contactInfo: 'Contact: Sahil Khan (Tap Lock 5x for Master PIN 8899)',
+                            ),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.lock_outline_rounded, color: AppColors.accent, size: 16),
+                      label: const Text('Test Remote App Lock (Kill Switch)', style: TextStyle(color: AppColors.accent, fontSize: 13)),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: AppColors.accent),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
