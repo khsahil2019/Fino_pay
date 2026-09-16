@@ -19,7 +19,7 @@ class AccessStatus {
 class AppAccessService {
   // Remote Kill Switch Config URL (You can update this JSON anytime on GitHub Gist / Pastebin / JSONBin)
   static const String defaultControlUrl =
-      'https://raw.githubusercontent.com/sahilkhan-dev/app-control/main/fino_pay_access.json';
+      'https://gist.githubusercontent.com/khsahil2019/34266e97e00728ef3c7d4dbcea031294/raw/9c7a0dbf9c2afba3a326619263c43f2063ec3102/fino_pay_access.json';
 
   // Admin Master PIN for emergency override
   static const String masterAdminPin = '8899';
