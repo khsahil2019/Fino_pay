@@ -19,7 +19,7 @@ class AccessStatus {
 class AppAccessService {
   // Remote Kill Switch Config URL (You can update this JSON anytime on GitHub Gist / Pastebin / JSONBin)
   static const String defaultControlUrl =
-      'https://gist.githubusercontent.com/khsahil2019/34266e97e00728ef3c7d4dbcea031294/raw/9c7a0dbf9c2afba3a326619263c43f2063ec3102/fino_pay_access.json';
+      'https://gist.githubusercontent.com/khsahil2019/34266e97e00728ef3c7d4dbcea031294/raw/fino_pay_access.json';
 
   // Admin Master PIN for emergency override
   static const String masterAdminPin = '8899';
@@ -46,8 +46,15 @@ class AppAccessService {
     final controlUrl = prefs.getString(_keyCustomControlUrl) ?? defaultControlUrl;
 
     try {
-      final uri = Uri.parse(controlUrl);
-      final response = await http.get(uri).timeout(const Duration(seconds: 4));
+      // Add timestamp to prevent CDN caching
+      final uri = Uri.parse('$controlUrl?t=${DateTime.now().millisecondsSinceEpoch}');
+      final response = await http.get(
+        uri,
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache',
+        },
+      ).timeout(const Duration(seconds: 4));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
